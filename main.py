@@ -41,15 +41,23 @@ def handle_rule(rulebytes):
 
 def handle_cfg(cfgbytes):
     cfgstr = str(cfgbytes)
-    # write to profile
-    ipsec_conf = open('ipsec.conf', 'a')
-    ipsec_conf.write(cfgstr)
-    ipsec_conf.write('\n')
-    ipsec_conf.close()
-    # strongswan operations
+    # get conn name
     conn_name = cfgstr[5:cfgstr.find('\n')]
-    print "ipsec conn: " + conn_name
-    os.system("ipsec reload && ipsec up " + conn_name)
+    if (conn_name[-2:] == "-d"):
+        # remove the conn
+        # strongswan operations
+        print "strongswan down " + conn_name[0: -2]
+        os.system("strongswan reload && strongswan down " + conn_name[0: -2])
+    else:
+        # add the conn
+        # write to profile
+        ipsec_conf = open('ipsec.conf', 'w')
+        ipsec_conf.write(cfgstr)
+        ipsec_conf.write('\n')
+        ipsec_conf.close()
+        # strongswan operations
+        print "strongswan reload && strongswan up " + conn_name
+        os.system("strongswan reload && strongswan up " + conn_name)
 
 
 def unknown_packet_callback(pkt):
@@ -68,7 +76,6 @@ def start():
     # print "Agent is running..."
 
     while True:
-        print "> ",
         if str(raw_input()) == "exit":
             break
 

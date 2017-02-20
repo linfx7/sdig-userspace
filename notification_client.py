@@ -48,8 +48,6 @@ class notification_client:
                 print e
                 break
 
-            break
-
 
     def _status_notification(self):
         current = psutil.net_io_counters().bytes_recv + psutil.net_io_counters().bytes_sent
